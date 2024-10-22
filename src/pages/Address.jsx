@@ -2,8 +2,10 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
 import { FaEthereum } from "react-icons/fa";
-import { FiArrowUpRight } from "react-icons/fi";
+import { FaArrowRightLong } from "react-icons/fa6";
 import { LuArrowDownWideNarrow } from "react-icons/lu";
+
+import { Table } from "../components";
 
 import { alchemy } from "../constants";
 import { toEther } from "../utils/formatter";
@@ -49,7 +51,7 @@ function Address() {
                 })
             ]
 
-            const [balance, txCount, externalTx, internalTx, firstTx] = await Promise.all(promises).catch(error => console.log("Error: ", error));
+            const [balance, txCount, externalTx, internalTx, firstTx] = await Promise.all(promises);
 
             setAddInfo({
                 balance: Number(toEther(balance._hex, false)),
@@ -61,13 +63,15 @@ function Address() {
                 }
             });
 
-            console.log(balance, txCount, externalTx, internalTx, firstTx)
+            // console.log(balance, txCount, externalTx, internalTx, firstTx)
         }
 
         if (address) {
             addressInfo();
         }
     }, [address])
+
+    console.log(addInfo)
 
     return (
         addInfo && (
@@ -119,12 +123,34 @@ function Address() {
                 >Internal Transactions</span>
             </div>
 
-            <div className="bg-dark-1 text-white px-5 py-2 border border-dark-2 rounded-xl">
-                <div className="flex items-center gap-1 py-2">
-                    <LuArrowDownWideNarrow />
-                    <span>Latest 25 from a total of {addInfo?.tx?.count} transactions</span>
-                </div>
-                <table></table>
+            <div className="flex items-center gap-1 bg-dark-1 text-white px-5 pt-4 pb-4 border-t-[1px] border-x-[1px] border-dark-2 rounded-t-xl">
+                <LuArrowDownWideNarrow />
+                <span className="text-[15px]">
+                    <span>Latest 25 from a total of&nbsp;</span>
+                    <span 
+                        className="text-blue-1 hover:text-blue-300 cursor-pointer"
+                        onClick={() => navigate(`/txs?a=${address}`)}
+                    >{addInfo?.tx?.count.toLocaleString()}&nbsp;</span>
+                    <span>transactions</span>
+                </span>
+            </div>
+
+            <Table>
+                {addInfo.tx.external.map(tx => (
+                    <Table.Row
+                        txHash={tx.hash}
+                        blockNo={Number(tx.blockNum)}
+                        from={tx.from}
+                        isIn={tx.to == address}
+                        to={tx.to}
+                        amount={tx.value}
+                    />
+                ))}
+            </Table>
+
+            <div className="flex justify-center items-center gap-1 uppercase text-sm text-dark-5 hover:text-blue-1 p-3 border-x-[1px] border-b-[1px] border-dark-2 bg-dark-6 rounded-b-xl cursor-pointer">
+                <span>View all transactions</span>
+                <FaArrowRightLong />
             </div>
         </main>
     ));
