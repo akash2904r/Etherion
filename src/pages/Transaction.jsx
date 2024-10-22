@@ -9,7 +9,7 @@ import { HiOutlineQuestionMarkCircle } from "react-icons/hi2";
 
 import getTxData from "../utils/tx";
 import { alchemy } from "../constants";
-import { extraData, gasPrice, timestamp, toEther, toGwei } from "../utils/formatter";
+import { extraData, gasPrice, timestamp, toEther, toGwei, txFee } from "../utils/formatter";
 
 function Info({ 
     about, value, details, showDetails = false,
@@ -17,7 +17,7 @@ function Info({
     status = false, timestamp = false, burnt = false, gasFee = false
 }) {
     return (
-        <li className={`flex items-center text-[15px] text-dark-5 py-2 ${top ? "border-t-[1px] border-dark-2 mt-2.5 pt-4" : bottom ? "border-b-[1px] border-dark-2 mb-2.5 pb-4" : ""}`}>
+        <li className={`flex items-end text-[15px] text-dark-5 py-2 ${top ? "border-t-[1px] border-dark-2 mt-2.5 pt-4" : bottom ? "border-b-[1px] border-dark-2 mb-2.5 pb-4" : ""}`}>
             <span className="w-1/4 flex items-center gap-1.5">
                 <HiOutlineQuestionMarkCircle />
                 <span>{about}:</span>
@@ -112,7 +112,7 @@ function Transaction() {
         }
     }, [txHash])
 
-    console.log(txInfo, extraData(txInfo.data))
+    console.log(txInfo && txInfo)
 
     return (
         <main className="px-5 bg-dark-3 pb-20">
@@ -130,13 +130,26 @@ function Transaction() {
                             details={{ isNumber: true, navigate }} 
                         />
                         <Info timestamp about="Timestamp" value={txInfo.timestamp} />
-                        <Info top showDetails about="From" value={txInfo.from} />
-                        <Info bottom showDetails about="To" value={txInfo.to} />
+                        <Info 
+                            top 
+                            showDetails 
+                            about="From" 
+                            value={txInfo.from} 
+                            details={{ navigate }}
+                        />
+                        <Info 
+                            bottom 
+                            showDetails 
+                            about="To" 
+                            value={txInfo.to} 
+                            details={{ navigate }}
+                        />
                         <Info 
                             isValue
                             about="Value" 
                             value={toEther(txInfo.value._hex, false)} 
                         />
+                        <Info about="Transaction Fee" value={txFee(txInfo.txFee)} />
                         <Info about="Gas Price" value={gasPrice(txInfo.gasPrice._hex)} />
                     </ul>
 
@@ -150,8 +163,7 @@ function Transaction() {
                                     value={{ base: txInfo.baseFeePerGas, max: txInfo.maxFeePerGas, priority: txInfo.maxPriorityFeePerGas }} 
                                 />
                                 <Info 
-                                    burnt 
-                                    bottom
+                                    burnt
                                     about="Burnt & Txn Savings Fees" 
                                     value={{ burnt: txInfo.burntFee, saved: txInfo.txSavings }} 
                                 />

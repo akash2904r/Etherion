@@ -17,8 +17,10 @@ export const timestamp = (ts) => `${_ago(ts)} (${String(new Date(ts)).slice(0, 3
 
 export const extraData = (data, onlyData = false) => onlyData
     ? Utils.toUtf8String(Utils.arrayify(data))
-    : `${Utils.toUtf8String(Utils.arrayify(data))} (Hex: ${data})`;
+    : `${Utils.toUtf8String(Utils.arrayify(data))} (Hex: ${data ?? "Null"})`;
 
 export const baseFeePerGas = (amt) => `${toEther(amt, false)} ETH (${toGwei(amt)} Gwei)`;
 
 export const gasPrice = (amt) => `${toGwei(amt)} Gwei (${toEther(amt, false)} ETH)`;
+
+export const txFee = (fee) => `${fee} ETH`;
