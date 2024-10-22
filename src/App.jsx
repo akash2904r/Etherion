@@ -4,7 +4,14 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { FaEthereum } from "react-icons/fa";
 
 import { Navbar } from "./components";
-import { Home, Address, Block, Transaction, NotFound } from "./pages";
+import { 
+  Home, 
+  Address, 
+  Block, 
+  Transaction, 
+  NotFound, 
+  Transactions 
+} from "./pages";
 
 import { alchemy } from "./constants";
 import { toGwei } from "./utils/formatter";
@@ -49,7 +56,7 @@ function App() {
           <Route path="/block/:blockData" element={<Block />} />
           <Route path="/address/:address" element={<Address />} />
           <Route path="/tx/:txHash" element={<Transaction />} />
-          {/* <Route path="/txs" element={} /> */}
+          <Route path="/txs" element={<Transactions />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       
