@@ -1,4 +1,5 @@
-import { FaRegCopy } from "react-icons/fa6";
+import { useState } from "react";
+import { FaRegCopy, FaCheck } from "react-icons/fa6";
 
 import { hash, address } from "../utils/formatter";
 
@@ -24,7 +25,15 @@ function Table({ children }) {
 }
 
 function Row({ txHash, blockNo, from, isIn, to, amount }) {
-    const copy = (data) => navigator.clipboard.writeText(data);
+    const [copied, setCopied] = useState({
+        hash: false, from: false, to: false
+    });
+
+    const copy = (data, name) => {
+        setCopied(prev => ({ ...prev, [name]: true }));
+        navigator.clipboard.writeText(data)
+        setTimeout(() => setCopied(false), 750);
+    };
 
     return (
         <tr className="text-sm border-b-[1px] border-dark-2 text-blue-1">
@@ -32,8 +41,10 @@ function Row({ txHash, blockNo, from, isIn, to, amount }) {
                 <span className="hover:text-blue-300 cursor-pointer">{hash(txHash)}</span>
                 <span
                     className="text-dark-5 hover:text-blue-500 cursor-pointer"
-                    onClick={() => copy(txHash)}
-                ><FaRegCopy /></span>
+                    onClick={() => copy(txHash, "hash")}
+                >
+                    {copied.hash ? <FaCheck /> : <FaRegCopy />}
+                </span>
             </td>
             <td className="py-3 text-center">
                 <span className="hover:text-blue-300 cursor-pointer">{blockNo}</span>
@@ -42,8 +53,10 @@ function Row({ txHash, blockNo, from, isIn, to, amount }) {
                 <span className={`${isIn ? "hover:text-blue-300 cursor-pointer" : "text-white"}`}>{address(from)}</span>
                 <span
                     className="text-dark-5 hover:text-blue-500 cursor-pointer" 
-                    onClick={() => copy(from)}
-                ><FaRegCopy /></span>
+                    onClick={() => copy(from, "from")}
+                >
+                    {copied.from ? <FaCheck /> : <FaRegCopy />}
+                </span>
             </td>
             <td className="py-3 text-center">
                 {isIn ? (
@@ -56,8 +69,10 @@ function Row({ txHash, blockNo, from, isIn, to, amount }) {
                 <span className={`${!isIn ? "hover:text-blue-300 cursor-pointer" : "text-white"}`}>{address(to)}</span>
                 <span
                     className="text-dark-5 hover:text-blue-500 cursor-pointer" 
-                    onClick={() => copy(to)}
-                ><FaRegCopy /></span>
+                    onClick={() => copy(to, "to")}
+                >
+                    {copied.to ? <FaCheck /> : <FaRegCopy />}
+                </span>
             </td>
             <td className="py-3 text-center">
                 <span className="text-white">{amount} ETH</span>
