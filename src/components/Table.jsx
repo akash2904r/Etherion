@@ -1,12 +1,13 @@
 import { useState } from "react";
+import { BsInboxes } from "react-icons/bs";
 import { FaRegCopy, FaCheck } from "react-icons/fa6";
 
 import { hash, address } from "../utils/formatter";
 
-function Table({ children }) {
+function Table({ children, noEntries = false }) {
     return (
         <table className="w-full bg-dark-1 text-white border-x-[1px] border-dark-2">
-            <thead className="border-b-[1px] border-dark-2 px-5">
+            <thead className={`border-b-[1px] ${noEntries && "border-t-[1px]"} border-dark-2 px-5`}>
                 <tr className="text-sm">
                     <th className="py-2.5">Transaction Hash</th>
                     <th className="py-2.5">Block</th>
@@ -81,6 +82,22 @@ function Row({ txHash, blockNo, from, isIn, to, amount }) {
     );
 }
 
+function NoEntries() {
+    return (
+        <>
+            <Table noEntries />
+            <div className="flex flex-col gap-1.5 justify-center items-center py-24 bg-dark-1 border border-dark-2 border-t-transparent">
+                <div className="px-3.5 py-3.5 rounded-full border border-yellow-500/70 bg-yellow-500/20">
+                    <BsInboxes size={25} color="#eab308b3" />
+                </div>
+                <div className="text-white text-xl font-semibold">There are no matching entries</div>
+                <div className="text-dark-5">Please try again later</div>
+            </div>
+        </>
+    );
+}
+
 Table.Row = Row;
+Table.NoEntries = NoEntries;
 
 export default Table;
