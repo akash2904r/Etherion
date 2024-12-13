@@ -14,8 +14,8 @@ function Address() {
     const navigate = useNavigate();
     const { address } = useParams();
 
-    const [showing, setShowing] = useState("Txs");
     const [addInfo, setAddInfo] = useState();
+    const [showing, setShowing] = useState("Txs");
 
     useEffect(() => {
         async function addressInfo() {
@@ -31,15 +31,15 @@ function Address() {
                     excludeZeroValue: true,
                     maxCount: 25, 
                 }),
-                await alchemy.core.getAssetTransfers({
-                    fromBlock: '0x0',
-                    toBlock: "latest",
-                    fromAddress: address,
-                    category: ['internal'],
-                    order: 'desc',
-                    excludeZeroValue: true,
-                    maxCount: 25, 
-                }),
+                // await alchemy.core.getAssetTransfers({
+                //     fromBlock: '0x0',
+                //     toBlock: "latest",
+                //     fromAddress: address,
+                //     category: ['internal'],
+                //     order: 'desc',
+                //     excludeZeroValue: true,
+                //     maxCount: 25, 
+                // }),
                 await alchemy.core.getAssetTransfers({
                     fromBlock: '0x0',
                     toBlock: "latest",
@@ -51,19 +51,19 @@ function Address() {
                 })
             ]
 
-            const [balance, txCount, externalTx, internalTx, firstTx] = await Promise.all(promises);
+            const [balance, txCount, externalTx, /* internalTx, */ firstTx] = await Promise.all(promises);
 
             setAddInfo({
                 balance: Number(toEther(balance._hex, false)),
                 tx: {
                     count: txCount,
                     external: externalTx.transfers,
-                    internal: internalTx.transfers,
+                    // internal: internalTx.transfers,
                     first: firstTx.transfers[0]
                 }
             });
 
-            // console.log(balance, txCount, externalTx, internalTx, firstTx)
+            console.log(balance, txCount, externalTx, /* internalTx, */ firstTx)
         }
 
         if (address) {
@@ -123,35 +123,45 @@ function Address() {
                 >Internal Transactions</span>
             </div>
 
-            <div className="flex items-center gap-1 bg-dark-1 text-white px-5 pt-4 pb-4 border-t-[1px] border-x-[1px] border-dark-2 rounded-t-xl">
-                <LuArrowDownWideNarrow />
-                <span className="text-[15px]">
-                    <span>Latest 25 from a total of&nbsp;</span>
-                    <span 
-                        className="text-blue-1 hover:text-blue-300 cursor-pointer"
-                        onClick={() => navigate(`/txs?a=${address}`)}
-                    >{addInfo?.tx?.count.toLocaleString()}&nbsp;</span>
-                    <span>transactions</span>
-                </span>
-            </div>
+            {addInfo.tx.external.length ? (
+                <>
+                    <div className="flex items-center gap-1 bg-dark-1 text-white px-5 pt-4 pb-4 border-t-[1px] border-x-[1px] border-dark-2 rounded-t-xl">
+                        <LuArrowDownWideNarrow />
+                        <span className="text-[15px]">
+                            <span>Latest {addInfo?.tx?.external.length < 25 ? addInfo?.tx?.external.length : "25"} from a total of&nbsp;</span>
+                            <span 
+                                className="text-blue-1 hover:text-blue-300 cursor-pointer"
+                                onClick={() => navigate(`/txs?a=${address}`)}
+                            >{addInfo?.tx?.count.toLocaleString()}&nbsp;</span>
+                            <span>transactions</span>
+                        </span>
+                    </div>
+                    <Table>
+                        {addInfo.tx.external.map(tx => (
+                            <Table.Row
+                                txHash={tx.hash}
+                                blockNo={Number(tx.blockNum)}
+                                from={tx.from}
+                                isIn={tx.to == address}
+                                to={tx.to}
+                                amount={tx.value}
+                            />
+                        ))}
+                    </Table>
+                </>
+            ) : (
+                <Table.NoEntries />
+            )}
 
-            <Table>
-                {addInfo.tx.external.map(tx => (
-                    <Table.Row
-                        txHash={tx.hash}
-                        blockNo={Number(tx.blockNum)}
-                        from={tx.from}
-                        isIn={tx.to == address}
-                        to={tx.to}
-                        amount={tx.value}
-                    />
-                ))}
-            </Table>
-
-            <div className="flex justify-center items-center gap-1 uppercase text-sm text-dark-5 hover:text-blue-1 p-3 border-x-[1px] border-b-[1px] border-dark-2 bg-dark-6 rounded-b-xl cursor-pointer">
-                <span>View all transactions</span>
-                <FaArrowRightLong />
-            </div>
+            {addInfo.tx.count > 25 && (
+                <div 
+                    className="flex justify-center items-center gap-1 uppercase text-sm text-dark-5 hover:text-blue-1 p-3 border-x-[1px] border-b-[1px] border-dark-2 bg-dark-6 rounded-b-xl cursor-pointer"
+                    onClick={() => navigate(`/txs?a=${address}`)}
+                >
+                    <span>View all transactions</span>
+                    <FaArrowRightLong />
+                </div>
+            )}
         </main>
     ));
 }
