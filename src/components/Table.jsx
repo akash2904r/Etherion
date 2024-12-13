@@ -86,7 +86,7 @@ function NoEntries() {
     return (
         <>
             <Table noEntries />
-            <div className="flex flex-col gap-1.5 justify-center items-center py-24 bg-dark-1 border border-dark-2 border-t-transparent">
+            <div className="flex flex-col gap-1.5 justify-center items-center py-28 bg-dark-1 border border-dark-2 border-t-transparent">
                 <div className="px-3.5 py-3.5 rounded-full border border-yellow-500/70 bg-yellow-500/20">
                     <BsInboxes size={25} color="#eab308b3" />
                 </div>
